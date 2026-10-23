@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dxdydz计算</title>
+<style>
+*{
+    box-sizing: border-box;
+    font-family: "Microsoft Yahei",sans-serif;
+    margin: 0;
+    padding: 0;
+}
+body{
+    background-color: #f0f0f0;
+    padding: 30px;
+    max-width: 720px;
+    margin: 0 auto;
+    color: #222;
+    line-height: 1.6;
+}
+.main{
+    background: #f0f0f0;
+}
+.item{
+    margin-bottom: 14px;
+}
+label{
+    display: inline-block;
+    width: 110px;
+}
+input, select{
+    padding: 6px 8px;
+    border: 1px solid #bbbbbb;
+    background: #f0f0f0;
+    font-size: 15px;
+}
+button{
+    padding: 6px 12px;
+    border:1px solid #aaa;
+    background: #f0f0f0;
+    cursor: pointer;
+    font-size:14px;
+}
+button:hover{
+    background: #e6e6e6;
+}
+#out{
+    margin-top:12px;
+    padding:8px;
+    background:#e8e8e8;
+    font-family:Consolas,monospace;
+    word-break: break-all;
+}
+.tip{
+    margin-top:6px;
+    font-size:13px;
+    color:#555;
+}
+</style>
+</head>
+<body>
+<div class="main">
+    <div class="item">
+        <label>目标选择器：</label>
+        <select id="sel">
+            <option value="@a">@a</option>
+            <option value="@e" selected>@e</option>
+            <option value="@s">@s</option>
+            <option value="@p">@p</option>
+            <option value="@r">@r</option>
+            <option value="@n">@n</option>
+        </select>
+    </div>
+    <div class="item">
+        <label>实体类型 type：</label>
+        <input id="typ" placeholder="留空不填，例 item">
+    </div>
+    <div class="item">
+        <label>实体名称 name：</label>
+        <input id="nam" placeholder="留空不填，例 铁砧">
+    </div>
+    <div class="item">
+        <label>保留两位小数：</label>
+        <select id="useDecimal">
+            <option value="1" selected>开启</option>
+            <option value="0">关闭</option>
+        </select>
+    </div>
+    <div class="item">
+        <label>起点坐标：</label>
+        <input id="pos1" placeholder="输入坐标 例如1 1 1 或 1.00 1.00 1.00" value="" style="width:260px;">
+    </div>
+    <div class="item">
+        <label>终点坐标：</label>
+        <input id="pos2" placeholder="输入坐标 例如1 1 1 或 1.00 1.00 1.00" value="" style="width:260px;">
+    </div>
+    <div class="item">
+        <button onclick="build()">生成选择器</button>
+        <button onclick="copy()">复制结果</button>
+    </div>
+    <div id="out"></div>
+    <div class="tip">测试阶段,可能会有一些小bug</div>
+</div>
+
+<script>
+function build(){
+    let sel = document.getElementById("sel").value;
+    let typ = document.getElementById("typ").value.trim();
+    let nam = document.getElementById("nam").value.trim();
+    let decimalSwitch = document.getElementById("useDecimal").value;
+    let p1 = document.getElementById("pos1").value.trim().split(/\s+/).filter(v=>v!=='');
+    let p2 = document.getElementById("pos2").value.trim().split(/\s+/).filter(v=>v!=='');
+
+    let x1 = parseFloat(p1[0]) || 0;
+    let y1 = parseFloat(p1[1]) || 0;
+    let z1 = parseFloat(p1[2]) || 0;
+    let x2 = parseFloat(p2[0]) || 0;
+    let y2 = parseFloat(p2[1]) || 0;
+    let z2 = parseFloat(p2[2]) || 0;
+
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    let dz = z2 - z1;
+
+    function fmt(n){
+        if(decimalSwitch === "1"){
+            return n.toFixed(2);
+        }else{
+            return String(Math.trunc(n));
+        }
+    }
+
+    let arr = [];
+    if(typ) arr.push("type="+typ);
+    if(nam) arr.push("name="+nam);
+    arr.push(`x=${fmt(x1)},y=${fmt(y1)},z=${fmt(z1)},dx=${fmt(dx)},dy=${fmt(dy)},dz=${fmt(dz)}`);
+
+    let res = sel + "[" + arr.join(",") + "]";
+    document.getElementById("out").innerText = res;
+}
+function copy(){
+    let text = document.getElementById("out").innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+        alert("已复制");
+    })
+}
+build();
+</script>
+</body>
+</html>
